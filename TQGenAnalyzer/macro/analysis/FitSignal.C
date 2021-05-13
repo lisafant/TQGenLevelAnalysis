@@ -119,11 +119,11 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
   leg->AddEntry(h3, "BW","L");
   leg->Draw("same");
   plot -> Draw("Same");
-  canv.SaveAs( ("~/www/TQ-WORK/mass/fitSignal_m"+mass+".png").c_str() );
-  canv.SaveAs( ("~/www/TQ-WORK/mass/fitSignal_m"+mass+".pdf").c_str() );
+  canv.SaveAs( ("/eos/user/l/lfantini/www/TQ-WORK/mass/fitSignal_m"+mass+".png").c_str() );
+  canv.SaveAs( ("/eos/user/l/lfantini/www/TQ-WORK/mass/fitSignal_m"+mass+".pdf").c_str() );
   canv.SetLogy();
-  canv.SaveAs( ("~/www/TQ-WORK/mass/fitSignal_m"+mass+"_LOG.png").c_str() );
-  canv.SaveAs( ("~/www/TQ-WORK/mass/fitSignal_m"+mass+"_LOG.pdf").c_str() );
+  canv.SaveAs( ("/eos/user/l/lfantini/www/TQ-WORK/mass/fitSignal_m"+mass+"_LOG.png").c_str() );
+  canv.SaveAs( ("/eos/user/l/lfantini/www/TQ-WORK/mass/fitSignal_m"+mass+"_LOG.pdf").c_str() );
  
   return r;
  
@@ -132,10 +132,40 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
 
 
 void fitAll(){
-
+  RooFitResult* r14= fit_convolution("14",14);			
   RooFitResult* r18=  fit_convolution("18",18);
   RooFitResult* r22=  fit_convolution("22",22);
   RooFitResult* r26=  fit_convolution("26",26);
+
+  RooRealVar* m14 = (RooRealVar*) r14->floatParsFinal().find("m0");
+  double m14val = m14->getVal();
+  double m14err = m14->getError();
+  RooRealVar* w14 = (RooRealVar*) r14->floatParsFinal().find("width");
+  double w14val = w14->getVal();
+  double w14err = w14->getError();
+  RooRealVar* sigma14 = (RooRealVar*) r14->floatParsFinal().find("sigma");
+  double sigma14val = sigma14->getVal();
+  double sigma14err = sigma14->getError();
+  /*  RooRealVar* sigma_pos14 = (RooRealVar*) r14->floatParsFinal().find("sigma_pos");
+  double sigma_pos14val = sigma_pos14->getVal();
+  double sigma_pos14err = sigma_pos14->getError();
+  */
+  RooRealVar* alpha14 = (RooRealVar*) r14->floatParsFinal().find("alpha");
+  double alpha14val = alpha14->getVal();
+  double alpha14err = alpha14->getError();
+  RooRealVar* alpha_pos14 = (RooRealVar*) r14->floatParsFinal().find("alpha_pos");
+  double alpha_pos14val = alpha_pos14->getVal();
+  double alpha_pos14err = alpha_pos14->getError();
+  RooRealVar* n14 = (RooRealVar*) r14->floatParsFinal().find("n");
+  double n14val = n14->getVal();
+  double n14err = n14->getError();
+  RooRealVar* n_pos14 = (RooRealVar*) r14->floatParsFinal().find("n_pos");
+  double n_pos14val = n_pos14->getVal();
+  double n_pos14err = n_pos14->getError();
+  RooRealVar* cb1frac14 = (RooRealVar*) r14->floatParsFinal().find("cb1frac");
+  double cb1frac14val = cb1frac14->getVal();
+  double cb1frac14err = cb1frac14->getError();
+
 
   RooRealVar* m18 = (RooRealVar*) r18->floatParsFinal().find("m0");
   double m18val = m18->getVal();
@@ -227,114 +257,114 @@ void fitAll(){
 
 
 
-  double mass_vec[3]={18,22,26};
-  double massErr_vec[3]={0};
+  double mass_vec[4]={14,18,22,26};
+  double massErr_vec[4]={0};
 
-  double m0_vec[3]={(m18val-18)/18,(m22val-22)/22,(m26val-26)/26};
-  double m0Err_vec[3]={m18err/18,m22err/22,m26err/22};
+  double m0_vec[4]={(m14val-14)/14,(m18val-18)/18,(m22val-22)/22,(m26val-26)/26};
+  double m0Err_vec[4]={m14err/14,m18err/18,m22err/22,m26err/22};
 
-  double w_vec[3]={w18val,w22val,w26val};
-  double wErr_vec[3]={w18err,w22err,w26err};
+  double w_vec[4]={w14val,w18val,w22val,w26val};
+  double wErr_vec[4]={w14err,w18err,w22err,w26err};
 
-  double cb1frac_vec[3]={cb1frac18val,cb1frac22val,cb1frac26val};
-  double cb1fracErr_vec[3]={cb1frac18err,cb1frac22err,cb1frac26err};
+  double cb1frac_vec[4]={cb1frac14val,cb1frac18val,cb1frac22val,cb1frac26val};
+  double cb1fracErr_vec[4]={cb1frac14err,cb1frac18err,cb1frac22err,cb1frac26err};
 
-  double sigma_vec[3]={sigma18val,sigma22val,sigma26val};
-  double sigmaErr_vec[3]={sigma18err,sigma22err,sigma26err};
-  //double sigma_pos_vec[3]={sigma_pos18val,sigma_pos22val,sigma_pos26val};
-  //double sigma_posErr_vec[3]={sigma_pos18err,sigma_pos22err,sigma_pos26err};
+  double sigma_vec[4]={sigma14val,sigma18val,sigma22val,sigma26val};
+  double sigmaErr_vec[4]={sigma14err,sigma18err,sigma22err,sigma26err};
+  //double sigma_pos_vec[4]={sigma_ps14val,sigma_pos18val,sigma_pos22val,sigma_pos26val};
+  //double sigma_posErr_vec[4]={sigma_ps14err,sigma_pos18err,sigma_pos22err,sigma_pos26err};
 
 
-  double alpha_vec[3]={alpha18val,alpha22val,alpha26val};
-  double alphaErr_vec[3]={alpha18err,alpha22err,alpha26err};
-  double alpha_pos_vec[3]={alpha_pos18val,alpha_pos22val,alpha_pos26val};
-  double alpha_posErr_vec[3]={alpha_pos18err,alpha_pos22err,alpha_pos26err};
+  double alpha_vec[4]={alpha14val,alpha18val,alpha22val,alpha26val};
+  double alphaErr_vec[4]={alpha14err,alpha18err,alpha22err,alpha26err};
+  double alpha_pos_vec[4]={alpha_pos14val,alpha_pos18val,alpha_pos22val,alpha_pos26val};
+  double alpha_posErr_vec[4]={alpha_pos14err,alpha_pos18err,alpha_pos22err,alpha_pos26err};
 
-  double n_vec[3]={n18val,n22val,n26val};
-  double nErr_vec[3]={n18err,n22err,n26err};
-  double n_pos_vec[3]={n_pos18val,n_pos22val,n_pos26val};
-  double n_posErr_vec[3]={n_pos18err,n_pos22err,n_pos26err};
+  double n_vec[4]={n14val,n18val,n22val,n26val};
+  double nErr_vec[4]={n14err,n18err,n22err,n26err};
+  double n_pos_vec[4]={n_pos14val,n_pos18val,n_pos22val,n_pos26val};
+  double n_posErr_vec[4]={n_pos14err,n_pos18err,n_pos22err,n_pos26err};
 
-  TGraphErrors* g_m0 = new TGraphErrors(3,mass_vec,m0_vec,massErr_vec,m0Err_vec);
+  TGraphErrors* g_m0 = new TGraphErrors(4,mass_vec,m0_vec,massErr_vec,m0Err_vec);
 
-  TGraphErrors* g_w = new TGraphErrors(3,mass_vec,w_vec,massErr_vec,wErr_vec);
+  TGraphErrors* g_w = new TGraphErrors(4,mass_vec,w_vec,massErr_vec,wErr_vec);
 
-  TGraphErrors* g_cb1frac = new TGraphErrors(3,mass_vec,cb1frac_vec,massErr_vec,cb1fracErr_vec);
+  TGraphErrors* g_cb1frac = new TGraphErrors(4,mass_vec,cb1frac_vec,massErr_vec,cb1fracErr_vec);
 
-  TGraphErrors* g_sigma = new TGraphErrors(3,mass_vec,sigma_vec,massErr_vec,sigmaErr_vec);
+  TGraphErrors* g_sigma = new TGraphErrors(4,mass_vec,sigma_vec,massErr_vec,sigmaErr_vec);
 
-  //  TGraphErrors* g_sigma_pos = new TGraphErrors(3,mass_vec,sigma_pos_vec,massErr_vec,sigma_posErr_vec);
+  //  TGraphErrors* g_sigma_pos = new TGraphErrors(4,mass_vec,sigma_pos_vec,massErr_vec,sigma_posErr_vec);
 
-  TGraphErrors* g_alpha = new TGraphErrors(3,mass_vec,alpha_vec,massErr_vec,alphaErr_vec);
+  TGraphErrors* g_alpha = new TGraphErrors(4,mass_vec,alpha_vec,massErr_vec,alphaErr_vec);
 
-  TGraphErrors* g_alpha_pos = new TGraphErrors(3,mass_vec,alpha_pos_vec,massErr_vec,alpha_posErr_vec);
+  TGraphErrors* g_alpha_pos = new TGraphErrors(4,mass_vec,alpha_pos_vec,massErr_vec,alpha_posErr_vec);
 
-  TGraphErrors* g_n = new TGraphErrors(3,mass_vec,n_vec,massErr_vec,nErr_vec);
+  TGraphErrors* g_n = new TGraphErrors(4,mass_vec,n_vec,massErr_vec,nErr_vec);
 
-  TGraphErrors* g_n_pos = new TGraphErrors(3,mass_vec,n_pos_vec,massErr_vec,n_posErr_vec);
+  TGraphErrors* g_n_pos = new TGraphErrors(4,mass_vec,n_pos_vec,massErr_vec,n_posErr_vec);
 
 
   TCanvas* canv=new TCanvas( "canv", "canv", 800., 600. );
   g_m0->Draw("APE");
   g_m0->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_m0->GetYaxis()->SetTitle("#frac{m_{TQ} - m_{nominal}}{m_{nominal}}");
-  canv->SaveAs("~/www/TQ-WORK/mass/m0_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/m0_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/m0_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/m0_vs_mass.pdf");
 
   g_w->Draw("APE");
   g_w->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_w->GetYaxis()->SetTitle("#Gamma_{TQ} [GeV]");
 
-  canv->SaveAs("~/www/TQ-WORK/mass/w_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/w_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/w_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/w_vs_mass.pdf");
 
   g_cb1frac->Draw("APE");
   g_cb1frac->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_cb1frac->GetYaxis()->SetTitle("CB1/CB2");
 
-  canv->SaveAs("~/www/TQ-WORK/mass/cb1frac_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/cb1frac_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/cb1frac_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/cb1frac_vs_mass.pdf");
 
   g_sigma->Draw("APE");
   g_sigma->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_sigma->GetYaxis()->SetTitle("#sigma_{CB} [GeV]");
 
-  canv->SaveAs("~/www/TQ-WORK/mass/sigma_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/sigma_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/sigma_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/sigma_vs_mass.pdf");
 
   /*
   g_sigma_pos->Draw("APE");
-  canv->SaveAs("~/www/TQ-WORK/mass/sigma_pos_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/sigma_pos_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/sigma_pos_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/sigma_pos_vs_mass.pdf");
   */
 
   g_alpha->Draw("APE");
   g_alpha->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_alpha->GetYaxis()->SetTitle("#alpha_{CB1}");
 
-  canv->SaveAs("~/www/TQ-WORK/mass/alpha_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/alpha_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/alpha_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/alpha_vs_mass.pdf");
 
   g_alpha_pos->Draw("APE");
   g_alpha_pos->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_alpha_pos->GetYaxis()->SetTitle("#alpha_{CB2}");
 
-  canv->SaveAs("~/www/TQ-WORK/mass/alpha_pos_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/alpha_pos_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/alpha_pos_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/alpha_pos_vs_mass.pdf");
 
   g_n->Draw("APE");
   g_n->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_n->GetYaxis()->SetTitle("n_{CB1}");
 
-  canv->SaveAs("~/www/TQ-WORK/mass/n_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/n_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/n_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/n_vs_mass.pdf");
 
   g_n_pos->Draw("APE");
   g_n_pos->GetXaxis()->SetTitle("m_{TQ} [GeV]");
   g_n_pos->GetYaxis()->SetTitle("n_{CB2}");
 
-  canv->SaveAs("~/www/TQ-WORK/mass/n_pos_vs_mass.png");
-  canv->SaveAs("~/www/TQ-WORK/mass/n_pos_vs_mass.pdf");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/n_pos_vs_mass.png");
+  canv->SaveAs("/eos/user/l/lfantini/www/TQ-WORK/mass/n_pos_vs_mass.pdf");
 
 
 }
