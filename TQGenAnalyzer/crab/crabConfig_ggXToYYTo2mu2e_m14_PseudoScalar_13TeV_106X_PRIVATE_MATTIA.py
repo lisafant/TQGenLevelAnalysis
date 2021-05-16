@@ -7,7 +7,7 @@ config.General.workArea    = 'crab_projects'
 
 ## Input analyzer pset ## 
 config.JobType.pluginName  = 'analysis'
-config.JobType.psetName    = 'ConfFile_cfg_LowPt.py'
+config.JobType.psetName    = 'ConfFile_cfg_LowPt_Upsilon.py'
 config.JobType.inputFiles  = ['lowPtEleReg_2018_02062020_nv.db',
                               'pileup_ALL.root',
                              'pileup_2018.root',
