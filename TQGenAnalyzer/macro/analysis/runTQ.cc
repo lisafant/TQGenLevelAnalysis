@@ -20,12 +20,14 @@
 #include <TAxis.h>
 
 #include "AnalysisTQ.h"
+#include "AnalysisCR.h"
 
 using namespace std;
 
 R__LOAD_LIBRARY(AnalysisTQ.cc+g);
+R__LOAD_LIBRARY(AnalysisCR.cc+g);
 
-int runTQ(std::string mass){
+int runTQ(std::string mass, std::string region){
 //  gROOT->ProcessLine(".L AnalysisTQ.cc+g");
   //  gROOT->ProcessLine("AnalysisTQ_cc.so");
   TH1F* h_counter;
@@ -71,27 +73,46 @@ int runTQ(std::string mass){
     h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
   }
 
+  if(mass=="Run2018B_trigger"){
+    t.Add("/eos/cms/store/group/phys_egamma/soffi/TQ-DATA/ntuple_MuOnia_Run2018B-UL2018_MiniAODv2-v1_WithTrigMatch.root");
+    TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/TQ-DATA/ntuple_MuOnia_Run2018B-UL2018_MiniAODv2-v1_WithTrigMatch.root");
+    h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
+  }
+
+  if(mass=="Run2018C_trigger"){
+    t.Add("/eos/cms/store/group/phys_egamma/soffi/TQ-DATA/ntuple_MuOnia_Run2018C-UL2018_MiniAODv2-v1_WithTrigMatch.root");
+    TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/TQ-DATA/ntuple_MuOnia_Run2018C-UL2018_MiniAODv2-v1_WithTrigMatch.root");
+    h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
+  }
+
+
+
+
   std::cout<<" entries: "<<t.GetEntries()<<std::endl;
 
   int tot = h_counter->GetBinContent(1);
   int trigger = h_counter->GetBinContent(2);
   std::cout<<tot<<" "<<trigger<<std::endl;
   //================ Run analysis
-  AnalysisTQ ana( &t );
-  ana.Loop(mass,tot,trigger);
-  
+  if(region=="TQ"){
+    AnalysisTQ ana( &t );
+    ana.Loop(mass,tot,trigger);
+  }else if(region=="CR"){
+    AnalysisCR ana( &t);
+    ana.Loop(mass, tot, trigger);
+  }  
   return 0;
 }
 
 
 void runTQAll(){
 
-  runTQ("5");
-  runTQ("7");
-  runTQ("9");
-  runTQ("14");
-  runTQ("18");
-  runTQ("22");
-  runTQ("26");
+  runTQ("5", "TQ");
+  runTQ("7", "TQ");
+  runTQ("9", "TQ");
+  runTQ("14", "TQ");
+  runTQ("18", "TQ");
+  runTQ("22", "TQ");
+  runTQ("26", "TQ");
 
 }
