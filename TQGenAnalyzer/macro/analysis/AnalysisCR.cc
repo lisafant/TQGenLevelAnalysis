@@ -35,7 +35,7 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
    if(mass=="7" || mass=="9")massnom=3.09;
    else massnom=9.46;
 
-   TFile* fout = new TFile(("fout_m"+mass+"_TQ.root").c_str(),"RECREATE");
+   TFile* fout = new TFile(("fout_m"+mass+"_CR.root").c_str(),"RECREATE");
 
    TTree tree_red("tree_red","");
 
