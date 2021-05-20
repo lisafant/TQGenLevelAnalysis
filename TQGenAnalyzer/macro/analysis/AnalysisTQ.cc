@@ -26,7 +26,7 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 
    Long64_t nbytes = 0, nb = 0;
    
-   int counter[10]={0};
+   int counter[13]={0};
    int counterBIS=0;
    int counterTRIS=0;
 
@@ -46,6 +46,10 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    Float_t e_eta2;
    Float_t e_phi1;
    Float_t e_phi2;
+   Float_t e_mvaValue1;
+   Float_t e_mvaPFValue1;
+   Float_t e_mvaValue2;
+   Float_t e_mvaPFValue2;
    Float_t m_eta1;
    Float_t m_eta2;
    Float_t m_phi1;
@@ -65,6 +69,7 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    Float_t TQ_eta; 
    Float_t Ym_eta; 
    Float_t Ye_eta; 
+   Float_t mass_Err;
 
 
    
@@ -78,6 +83,10 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    tree_red.Branch("e_eta2",&e_eta2,"e_eta2/F");
    tree_red.Branch("e_phi1",&e_phi1,"e_phi1/F");
    tree_red.Branch("e_phi2",&e_phi2,"e_phi2/F");
+   tree_red.Branch("e_mvaValue1", &e_mvaValue1, "e_mvaValue1/F");
+   tree_red.Branch("e_mvaPFValue1", &e_mvaPFValue1, "e_mvaPFValue1/F");
+   tree_red.Branch("e_mvaValue2", &e_mvaPFValue2, "e_mvaValue2/F");
+   tree_red.Branch("e_mvaPFValue2", &e_mvaPFValue2, "e_mvaPFValue/F");
    tree_red.Branch("m_eta1",&m_eta1,"m_eta1/F");
    tree_red.Branch("m_eta2",&m_eta2,"m_eta2/F");
    tree_red.Branch("m_phi1",&m_phi1,"m_phi1/F");
@@ -95,6 +104,7 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    tree_red.Branch("TQ_eta",&TQ_eta,"TQ_eta/F");
    tree_red.Branch("Ym_eta",&Ym_eta,"Ym_eta/F");
    tree_red.Branch("Ye_eta",&Ye_eta,"Ye_eta/F");
+   tree_red.Branch("mass_Err", &mass_Err, "mass_Err/F");
 
 
 
@@ -106,10 +116,13 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
       int nTQwithAtLeast2mu=0;
       int nTQwithAtLeast2muPtEtaID=0;
       int nTQwithAtLeast2muPtEtaIDVtxProb=0;
+      int nTQwithAtLeast2muPtEtaIDVtxProbMass=0;
+      int nTQwithAtLeast2muPtEtaIDVtxProbMassPt=0;
       int nTQwithAtLeast2el=0;
       int nTQwithAtLeast2elOver=0;
       int nTQwithAtLeast2elOverPtEtaID=0;
-      int nTQwithAtLeast2elOverPtEtaIDVtxProb=0;
+      int nTQwithAtLeast2elOverPtEtaIDLp=0;
+      int nTQwithAtLeast2elOverPtEtaIDLpVtxProb=0;
       int nTQwithDeltaR=0;
       int nTQwithVtxProb=0;
       //      std::cout<< "---------------------------------------------" <<std::endl;
@@ -118,6 +131,9 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 
       int best_cand=999;
       float prob_cand=0;
+      int reco_type=-1;
+      float mva_sum = -999.;
+      float mva_mix_sum= 0.; 
 
       // ------------- TQ -------------- //
       for(int i=0; i< nTQReco; i++){
@@ -128,13 +144,23 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 
 	nTQwithAtLeast2mu++;
 
-	if((*recoTQ_Y1vtxprob)[i]<0.05)continue;
-        nTQwithAtLeast2muPtEtaIDVtxProb++;
-
-
 	if((*recoTQ_softID1)[i]==0 || (*recoTQ_softID2)[i]==0) continue;
 
 	nTQwithAtLeast2muPtEtaID++;
+                                 
+	if((*recoTQ_Y1vtxprob)[i]<0.05)continue;
+      
+        nTQwithAtLeast2muPtEtaIDVtxProb++;
+
+
+        if ((*recoTQ_Y1pt)[i]<12.) continue;
+
+      
+        nTQwithAtLeast2muPtEtaIDVtxProbMass++;
+
+        if((*recoTQ_Y1mass)[i]<7.) continue;
+
+        nTQwithAtLeast2muPtEtaIDVtxProbMassPt++;
 
 
 
@@ -156,13 +182,24 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 
 	if(isPt3wrong || isPt4wrong || isEta3wrong || isEta4wrong || isID3wrong || isID4wrong)continue;
 	
+
+        bool isPF = (*recoTQ_isPF3)[i]==1  && (*recoTQ_isPF4)[i]==1;
+        bool isMix = ((*recoTQ_isPF3)[i]==1 && (*recoTQ_isPF4)[i]==0) || ((*recoTQ_isPF3)[i]==0 && (*recoTQ_isPF4)[i]==1);
+        bool isLP = (*recoTQ_isPF3)[i]==0  && (*recoTQ_isPF4)[i]==0;
+
         nTQwithAtLeast2elOverPtEtaID++;
+
+
+        if(isLP) continue;
+
+        
+        nTQwithAtLeast2elOverPtEtaIDLp++;
 
 
 	//select TQ with highest vtx prob
 	if((*recoTQ_Y2vtxprob)[i]<0.05)continue;
 
-        nTQwithAtLeast2elOverPtEtaIDVtxProb++;
+        nTQwithAtLeast2elOverPtEtaIDLpVtxProb++;
 
 
 	float dR12=DeltaR((*recoTQ_eta1)[i],(*recoTQ_phi1)[i],(*recoTQ_eta2)[i],(*recoTQ_phi2)[i]);
@@ -179,29 +216,55 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 
         nTQwithVtxProb++;
 
+
+        if(isMix && (*recoTQ_isPF3)[i]==1){
+           mva_mix_sum = (*recoTQ_mvaPFValue3)[i] + (*recoTQ_mvaValue4)[i];
+        }else if(isMix && (*recoTQ_isPF3)[i]==0){
+           mva_mix_sum = (*recoTQ_mvaPFValue4)[i] + (*recoTQ_mvaValue3)[i];
+        }
+
+
+        if (isPF && reco_type!=1){
+          reco_type = 1;
+          mva_sum = (*recoTQ_mvaPFValue3)[i] + (*recoTQ_mvaPFValue4)[i];
+          best_cand = i;
+        }else if(isPF && reco_type==1 && ((*recoTQ_mvaPFValue3)[i] + (*recoTQ_mvaPFValue4)[i])>mva_sum){
+          reco_type = 1;
+          mva_sum = (*recoTQ_mvaPFValue3)[i] + (*recoTQ_mvaPFValue4)[i];
+          best_cand = i;
+        }else if(isMix && reco_type!=1 && mva_mix_sum>mva_sum){
+          reco_type = 0;
+          mva_sum = mva_mix_sum;
+          best_cand = i;
+        }
+
+
 	
-	if((*recoTQ_Y2vtxprob)[i]> prob_cand){
+/*	if((*recoTQ_Y2vtxprob)[i]> prob_cand){
 
 	  prob_cand = (*recoTQ_Y2vtxprob)[i];
 	  best_cand= i;
 	}
 
-	
+*/	
 
       }
       
 
       //increase counters
       if(nTQwithAtLeast2mu>0)counter[1]++;
-      if(nTQwithAtLeast2muPtEtaIDVtxProb>0)counter[2]++;
-      if(nTQwithAtLeast2muPtEtaID>0)counter[3]++;
+      if(nTQwithAtLeast2muPtEtaID>0)counter[2]++;
+      if(nTQwithAtLeast2muPtEtaIDVtxProb>0)counter[3]++;
+      if(nTQwithAtLeast2muPtEtaIDVtxProbMass>0)counter[4]++;
+      if(nTQwithAtLeast2muPtEtaIDVtxProbMassPt>0)counter[5]++;
 
-      if(nTQwithAtLeast2el>0)counter[4]++;
-      if(nTQwithAtLeast2elOver>0)counter[5]++;
-      if(nTQwithAtLeast2elOverPtEtaID>0)counter[6]++;
-      if(nTQwithAtLeast2elOverPtEtaIDVtxProb>0)counter[7]++;
-      if(nTQwithDeltaR>0)counter[8]++;
-      if(nTQwithVtxProb>0)counter[9]++;
+      if(nTQwithAtLeast2el>0)counter[6]++;
+      if(nTQwithAtLeast2elOver>0)counter[7]++;
+      if(nTQwithAtLeast2elOverPtEtaID>0)counter[8]++;
+      if(nTQwithAtLeast2elOverPtEtaIDLp>0)counter[9]++;
+      if(nTQwithAtLeast2elOverPtEtaIDLpVtxProb>0)counter[10]++;
+      if(nTQwithDeltaR>0)counter[11]++;
+      if(nTQwithVtxProb>0)counter[12]++;
       
       //fillign reduced tree with candidate infos
       if(best_cand<999){
@@ -214,6 +277,10 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 	e_phi2=(*recoTQ_phi4)[best_cand];
 	e_isPF1=(*recoTQ_isPF3)[best_cand];
 	e_isPF2=(*recoTQ_isPF4)[best_cand];
+        e_mvaValue1=(*recoTQ_mvaValue3)[best_cand];
+        e_mvaPFValue1=(*recoTQ_mvaPFValue3)[best_cand];
+        e_mvaValue2=(*recoTQ_mvaValue4)[best_cand];
+        e_mvaPFValue2=(*recoTQ_mvaPFValue4)[best_cand];
 
 
 	m_pt1=(*recoTQ_pt1)[best_cand];
@@ -237,7 +304,8 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 	TQ_mass=(*recoTQ_mass)[best_cand]; 
 	TQ_mass_tilde=(*recoTQ_mass)[best_cand]-(*recoTQ_Y1mass)[best_cand]+9.46; 
 	TQ_pt=(*recoTQ_pt)[best_cand]; 
-	TQ_eta=(*recoTQ_eta)[best_cand]; 
+	TQ_eta=(*recoTQ_eta)[best_cand];
+        mass_Err= (*recoTQ_massErr)[best_cand]; 
 
 	tree_red.Fill();
       }
@@ -248,15 +316,18 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    std::cout<<" trigger: "<<trigger<<std::endl;
    std::cout<<" 2mu reco: "<<counter[0]<<std::endl;
    std::cout<<" 2mu reco pt eta: "<<counter[1]<<std::endl;
-   std::cout<<" 2mu reco pt eta vtx: "<<counter[2]<<std::endl;
-   std::cout<<" 2mu reco pt eta vtx id: "<<counter[3]<<std::endl;
+   std::cout<<" 2mu reco pt eta id: "<<counter[2]<<std::endl;
+   std::cout<<" 2mu reco pt eta id vtx: "<<counter[3]<<std::endl;
+   std::cout<<" 2mu reco pt eta id vtx mass: "<<counter[4]<<std::endl;
+   std::cout<<" 2mu reco pt eta id vtx mass pt: "<<counter[5]<<std::endl;
 
-   std::cout<<" 2e reco: "<<counter[4]<<std::endl;
-   std::cout<<" 2e reco no overlap: "<<counter[5]<<std::endl;
-   std::cout<<" 2e reco no overlap pt eta id : "<<counter[6]<<std::endl;
-   std::cout<<" 2e reco no overlap pt eta id vtx: "<<counter[7]<<std::endl;
-   std::cout<<" TQ deltaR: "<<counter[8]<<std::endl;
-   std::cout<<" TQ vtx: "<<counter[9]<<std::endl;
+   std::cout<<" 2e reco: "<<counter[6]<<std::endl;
+   std::cout<<" 2e reco no overlap: "<<counter[7]<<std::endl;
+   std::cout<<" 2e reco no overlap pt eta id : "<<counter[8]<<std::endl;
+   std::cout<<" 2e reco no overlap pt eta id no lp: "<<counter[9]<<std::endl;
+   std::cout<<" 2e reco no overlap pt eta id no lp vtx: "<<counter[10]<<std::endl;
+   std::cout<<" TQ deltaR: "<<counter[11]<<std::endl;
+   std::cout<<" TQ vtx: "<<counter[12]<<std::endl;
       
 
    //creating efficiency counters
