@@ -27,7 +27,7 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
 
    Long64_t nbytes = 0, nb = 0;
    
-   int counter[13]={0};
+   int counter[14]={0};
    int counterBIS=0;
    int counterTRIS=0;
 
@@ -71,7 +71,9 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
    Float_t Ym_eta; 
    Float_t Ye_eta; 
    Float_t mass_Err;
-
+   Float_t x_sec;
+   Float_t puw2018;
+   Int_t n_vtx;
 
    
    tree_red.Branch("e_isPF1",&e_isPF1,"e_isPF1/I");
@@ -106,7 +108,9 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
    tree_red.Branch("Ym_eta",&Ym_eta,"Ym_eta/F");
    tree_red.Branch("Ye_eta",&Ye_eta,"Ye_eta/F");
    tree_red.Branch("mass_Err", &mass_Err, "mass_Err/F");
-
+   tree_red.Branch("x_sec", &x_sec, "x_sec/F");
+   tree_red.Branch("puw2018", &puw2018, "puw2018/F");
+   tree_red.Branch("n_vtx", &n_vtx, "n_vtx/I");
 
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -124,6 +128,7 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
       int nTQwithAtLeast2elOverPtEtaID=0;
       int nTQwithAtLeast2elOverPtEtaIDLp=0;
       int nTQwithAtLeast2elOverPtEtaIDLpVtxProb=0;
+      int nTQwithAtLeast2elOverPtEtaIDLpVtxProbMass=0;
       int nTQwithDeltaR=0;
       int nTQwithVtxProb=0;
       //      std::cout<< "---------------------------------------------" <<std::endl;
@@ -166,7 +171,7 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
 
 
 	//electrons
-	if(((*recoTQ_charge3)[i]*(*recoTQ_charge4)[i])<0 )continue;
+	if(((*recoTQ_charge3)[i]*(*recoTQ_charge4)[i])>0 )continue;
 
         nTQwithAtLeast2el++;
 
@@ -202,6 +207,9 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
 
         nTQwithAtLeast2elOverPtEtaIDLpVtxProb++;
 
+        if((*recoTQ_Y2mass)[i]<2.) continue;
+   
+        nTQwithAtLeast2elOverPtEtaIDLpVtxProbMass++;
 
 	float dR12=DeltaR((*recoTQ_eta1)[i],(*recoTQ_phi1)[i],(*recoTQ_eta2)[i],(*recoTQ_phi2)[i]);
 	float dR13=DeltaR((*recoTQ_eta1)[i],(*recoTQ_phi1)[i],(*recoTQ_eta3)[i],(*recoTQ_phi3)[i]);
@@ -213,7 +221,7 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
 	if(dR12<0.02 || dR13<0.02 ||dR14<0.02 ||dR23<0.02 ||dR24<0.02 ||dR34<0.02 )continue;
 	nTQwithDeltaR++;
 
-	if((*recoTQ_vtxprob)[i]>0)continue;
+	if((*recoTQ_vtxprob)[i]<=0)continue;
 
         nTQwithVtxProb++;
 
@@ -264,8 +272,9 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
       if(nTQwithAtLeast2elOverPtEtaID>0)counter[8]++;
       if(nTQwithAtLeast2elOverPtEtaIDLp>0)counter[9]++;
       if(nTQwithAtLeast2elOverPtEtaIDLpVtxProb>0)counter[10]++;
-      if(nTQwithDeltaR>0)counter[11]++;
-      if(nTQwithVtxProb>0)counter[12]++;
+      if(nTQwithAtLeast2elOverPtEtaIDLpVtxProbMass>0)counter[11]++;
+      if(nTQwithDeltaR>0)counter[12]++;
+      if(nTQwithVtxProb>0)counter[13]++;
       
       //fillign reduced tree with candidate infos
       if(best_cand<999){
@@ -307,6 +316,9 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
 	TQ_pt=(*recoTQ_pt)[best_cand]; 
 	TQ_eta=(*recoTQ_eta)[best_cand];
         mass_Err= (*recoTQ_massErr)[best_cand]; 
+        x_sec = xsec;
+        puw2018 = puw_2018;
+        n_vtx = nvtx;
 
 	tree_red.Fill();
       }
@@ -327,8 +339,9 @@ void AnalysisCR::Loop(std::string mass,int tot,int trigger)
    std::cout<<" 2e reco no overlap pt eta id : "<<counter[8]<<std::endl;
    std::cout<<" 2e reco no overlap pt eta id no lp: "<<counter[9]<<std::endl;
    std::cout<<" 2e reco no overlap pt eta id no lp vtx: "<<counter[10]<<std::endl;
-   std::cout<<" TQ deltaR: "<<counter[11]<<std::endl;
-   std::cout<<" TQ vtx: "<<counter[12]<<std::endl;
+   std::cout<<" 2e reco no overlap pt eta id no lp vtx mass(Ye): "<<counter[11]<<std::endl;
+   std::cout<<" TQ deltaR: "<<counter[12]<<std::endl;
+   std::cout<<" TQ vtx: "<<counter[13]<<std::endl;
       
 
    //creating efficiency counters
