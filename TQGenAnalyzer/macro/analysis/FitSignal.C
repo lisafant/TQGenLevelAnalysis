@@ -14,6 +14,7 @@
  #include "TCanvas.h"
  #include "TAxis.h"
  #include "TFile.h"
+#include "RooWorkspace.h"
 
 #include "TH1.h"
 #include "TLegend.h"
@@ -27,9 +28,9 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
 
   TFile *f = new TFile(("fout_m"+mass+"_TQ.root").c_str(), "READ");
   TTree *tree = (TTree*)f->Get("tree_red");
-  RooRealVar TQ_mass("TQ_mass","TQ_mass",0,50) ;
+  RooRealVar TQ_mass_tilde("TQ_mass_tilde","TQ_mass_tilde",0,50) ;
 
-  RooDataSet data("data","data",tree, RooArgSet(TQ_mass) );
+  RooDataSet data("data","data",tree, RooArgSet(TQ_mass_tilde) );
  
 
 
@@ -37,7 +38,7 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
   // Breit-Wigner
   RooRealVar m0( "m0", "m0", mass0, mass0*0.99,mass0*1.01 );
   RooRealVar width( "width", "width", mass0*0.0002, mass0*0.00002,mass0*0.002 );
-  RooBreitWigner bw( "bw", "bw", TQ_mass, m0, width );
+  RooBreitWigner bw( "bw", "bw", TQ_mass_tilde, m0, width );
 
   // Crystal-Ball
 
@@ -46,25 +47,25 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
   RooRealVar sigma( "sigma", "sigma", 0.5,0.1,5);
   RooRealVar alpha( "alpha", "alpha", 1.4,0.1,5 );
   RooRealVar n( "n", "n", 1.8,0.1,10);
-  RooCBShape cb( "cb", "cb", TQ_mass, mean, sigma, alpha, n );
+  RooCBShape cb( "cb", "cb", TQ_mass_tilde, mean, sigma, alpha, n );
 
   // Crystal-Ball pos
   RooRealVar mean_pos( "mean_pos", "mean_pos",mass0, 0.9*mass0,1.1*mass0);
   RooRealVar sigma_pos( "sigma_pos", "sigma_pos", 0.5,0.05,5 );
   RooRealVar alpha_pos( "alpha_pos", "alpha_pos", -1.4,-5,-0.1 );
   RooRealVar n_pos( "n_pos", "n_pos", 1.8,0.1,10);
-  RooCBShape cb_pos( "cb_pos", "cb_pos", TQ_mass, mean, sigma, alpha_pos, n_pos );
+  RooCBShape cb_pos( "cb_pos", "cb_pos", TQ_mass_tilde, mean, sigma, alpha_pos, n_pos );
 
 
   // Gaus
   RooRealVar mu( "mu", "mu", mass0);
   RooRealVar sigm( "sigm", "sigm", 3,0.1,10 );
-  RooGaussian g( "g", "g", TQ_mass, mu, sigm);
+  RooGaussian g( "g", "g", TQ_mass_tilde, mu, sigm);
 
   // convolution
-  TQ_mass.setBins(10000,"cache") ;
-  TQ_mass.setMin("cache",0.) ;
-  TQ_mass.setMax("cache",50) ;
+  TQ_mass_tilde.setBins(10000,"cache") ;
+  TQ_mass_tilde.setMin("cache",0.) ;
+  TQ_mass_tilde.setMax("cache",50) ;
 
   RooRealVar cb1frac("cb1frac", "fraction of component 1 in signal", 0.8, 0., 1.);
   RooAddPdf cbadd("cbadd", "Signal", RooArgList(cb, cb_pos), cb1frac);
@@ -73,17 +74,17 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
 
 
 
-  RooFFTConvPdf pdf( "pdf", "pdf", TQ_mass, bw,cb_pos);
-  RooFFTConvPdf pdf1( "pdf1", "pdf1", TQ_mass, pdf, cb);
-  RooFFTConvPdf pdf2( "pdf2", "pdf2", TQ_mass, cb,cb_pos);
-  RooFFTConvPdf pdf3( "pdf3", "pdf3", TQ_mass, bw,cbadd);
+  RooFFTConvPdf pdf( "pdf", "pdf", TQ_mass_tilde, bw,cb_pos);
+  RooFFTConvPdf pdf1( "pdf1", "pdf1", TQ_mass_tilde, pdf, cb);
+  RooFFTConvPdf pdf2( "pdf2", "pdf2", TQ_mass_tilde, cb,cb_pos);
+  RooFFTConvPdf pdf3( "pdf3", "pdf3", TQ_mass_tilde, bw,cbadd);
 
 
   RooFitResult* r =  pdf3.fitTo(data,Save());
-  RooCBShape cb1( "cb1", "cb1", TQ_mass, m0, sigma, alpha, n );
-  RooCBShape cb1_pos( "cb1_pos", "cb1_pos", TQ_mass, m0, sigma, alpha_pos, n_pos );
+  RooCBShape cb1( "cb1", "cb1", TQ_mass_tilde, m0, sigma, alpha, n );
+  RooCBShape cb1_pos( "cb1_pos", "cb1_pos", TQ_mass_tilde, m0, sigma, alpha_pos, n_pos );
   TCanvas canv( "canv", "canv", 800., 600. );
-  RooPlot* plot = TQ_mass.frame();
+  RooPlot* plot = TQ_mass_tilde.frame();
   plot -> SetTitle( "Convolution of a Breit-Wigner and a Crystal-Ball" );
   plot -> GetXaxis() -> SetTitle("TQ mass");
   plot -> GetYaxis() -> SetTitleOffset( 1.5 );
@@ -107,7 +108,7 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
   h2->SetLineStyle(kDashed);
   h3->SetLineStyle(kDashed);
   h->GetYaxis()->SetTitle("Events");
-  h->GetXaxis()->SetTitle("m_{TQ} [GeV]");
+  h->GetXaxis()->SetTitle("#tilde{m}_{TQ} [GeV]");
   h->GetYaxis()->SetRangeUser(0.01,2500);
   h -> Draw("");
 
@@ -124,6 +125,20 @@ RooFitResult* fit_convolution(std::string mass, double mass0)
   canv.SetLogy();
   canv.SaveAs( ("/eos/user/l/lfantini/www/TQ-WORK/mass/fitSignal_m"+mass+"_LOG.png").c_str() );
   canv.SaveAs( ("/eos/user/l/lfantini/www/TQ-WORK/mass/fitSignal_m"+mass+"_LOG.pdf").c_str() );
+
+  TQ_mass_tilde.setRange("range", 0, 60);
+
+  RooAbsReal *Int = pdf3.createIntegral(TQ_mass_tilde);
+  cout<<"integral: "<<Int->getVal()<<endl;
+
+  if(mass == "26"){
+    RooWorkspace *w = new RooWorkspace("w", "workspace");
+    w->import(pdf3);
+    w->import(data);
+    w->writeToFile("workspace_fit26.root");
+    gDirectory->Add(w);
+  }
+
  
   return r;
  
@@ -136,6 +151,7 @@ void fitAll(){
   RooFitResult* r18=  fit_convolution("18",18);
   RooFitResult* r22=  fit_convolution("22",22);
   RooFitResult* r26=  fit_convolution("26",26);
+
 
   RooRealVar* m14 = (RooRealVar*) r14->floatParsFinal().find("m0");
   double m14val = m14->getVal();
