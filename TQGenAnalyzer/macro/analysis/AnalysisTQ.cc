@@ -26,7 +26,7 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
 
    Long64_t nbytes = 0, nb = 0;
    
-   int counter[14]={0};
+   int counter[13]={0};
    int counterBIS=0;
    int counterTRIS=0;
 
@@ -72,7 +72,7 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    Float_t mass_Err;
    Float_t x_sec;
    Float_t puw2018;
-   Int_t n_vtx;
+   Float_t nvxt;
 
 
    
@@ -110,10 +110,14 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    tree_red.Branch("mass_Err", &mass_Err, "mass_Err/F");
    tree_red.Branch("x_sec", &x_sec, "x_sec/F");
    tree_red.Branch("puw2018", &puw2018, "puw2018/F");
-   tree_red.Branch("n_vtx", &n_vtx, "n_vtx/I");
+   tree_red.Branch("nvtx", &nvtx, "nvtx/I");
 
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
+      Long64_t ientry = LoadTree(jentry);
+      if (ientry < 0) break;
+      Long64_t ientry = LoadTree(jentry);
+      if (ientry < 0) break;
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -403,8 +407,6 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    eff_counter->GetXaxis()->SetBinLabel(10 ,"ee vtx prob >0.1");
    eff_counter->GetXaxis()->SetBinLabel(11 ,"TQ all dR ok");
    eff_counter->GetXaxis()->SetBinLabel(12 ,"TQ vtx prob >0.1");
-
-
    effrel_counter->GetXaxis()->SetBinLabel(10 ,"ee vtx prob >0.1");
    effrel_counter->GetXaxis()->SetBinLabel(11 ,"TQ all dR ok");
    effrel_counter->GetXaxis()->SetBinLabel(12 ,"TQ vtx prob >0.1");
