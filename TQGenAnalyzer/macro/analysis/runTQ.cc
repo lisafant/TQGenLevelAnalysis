@@ -122,7 +122,21 @@ int runTQ(std::string mass, std::string region){
   }  
   return 0;
 }
+/*
+void runTQAll_data(){
+  runTQ("Run2018A_trigger", "TQ");
+  runTQ("Run2018B_trigger", "TQ");
+  runTQ("Run2018C_trigger", "TQ");
+  runTQ("Run2018D_trigger", "TQ");
+}
 
+void runCRAll_data(){
+  runTQ("Run2018A_trigger", "CR");
+  runTQ("Run2018B_trigger", "CR");
+  runTQ("Run2018C_trigger", "CR");
+  runTQ("Run2018D_trigger", "CR");
+}
+*/
 
 void runTQAll(){
 
