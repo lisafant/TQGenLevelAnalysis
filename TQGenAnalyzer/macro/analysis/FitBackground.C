@@ -1,0 +1,227 @@
+#include "TH1.h"
+#include "TCanvas.h"
+#include "TAxis.h"
+#include "TLegend.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TMath.h"
+#include "RooRealVar.h"
+#include "RooAbsReal.h"
+#include "RooDataSet.h"
+#include "RooAddPdf.h"
+#include "RooExtendPdf.h"
+#include "RooWorkspace.h"
+#include "RooArgSet.h"
+#include "RooChebychev.h"
+#include "RooGaussian.h"
+#include "RooFitResult.h"
+#include "RooPlot.h"
+#include "RooFormulaVar.h"
+#include "RooGenericPdf.h"
+using namespace RooFit;
+
+
+RooFitResult* Fit_SPS(){
+
+  TFile *fSPS = new TFile("fout_mSPS_TQ.root", "READ");
+  TTree* treeSPS = (TTree*)fSPS->Get("tree_red");
+
+  Long64_t nentries = (Long64_t)treeSPS->GetEntries();
+  cout<<"N. entries SPS: "<<nentries<<endl;
+
+  RooRealVar TQ_mass_tilde("TQ_mass_tilde", "TQ_mass_tilde", 0, 30);
+//  RooRealVar weight("weight", "weight", 0.004);
+  RooDataSet *data = new RooDataSet("data", "data", treeSPS, RooArgSet(TQ_mass_tilde));
+  
+//  RooFormulaVar wFunc("weig","event weight","0.004", TQ_mass_tilde);
+//  RooRealVar* weig = (RooRealVar*) data->addColumn(wFunc);
+//  RooDataSet wdata(data->GetName(),data->GetTitle(),data,*data->get(),0,weig->GetName());
+ 
+  RooRealVar m0("m0", "m0", 18., 15., 20.);
+  RooRealVar d("d", "d", -5., -10., 10.);
+
+  RooGenericPdf sigmoid_pdf("sigmoid_pdf", "sigmoid_pdf", "(TMath::Exp(TQ_mass_tilde))/(1+TMath::Exp((m0-TQ_mass_tilde)/d))", RooArgList(TQ_mass_tilde, m0, d));
+
+  
+  RooFitResult *r = sigmoid_pdf.fitTo(*data, Save());
+ 
+  RooPlot* plotSPS = TQ_mass_tilde.frame();
+  plotSPS->SetTitle( "SPS" );
+  plotSPS->GetXaxis()->SetTitle("#tilde{m}_{TQ} [GeV]");
+  plotSPS->GetYaxis()->SetTitleOffset( 1.5 );
+  plotSPS->GetYaxis()->SetTitle("Events / 0.3 GeV");
+  data->plotOn(plotSPS, Name ("MC"));
+  sigmoid_pdf.plotOn(plotSPS, Name("fit"));
+  TCanvas* canvSPS = new TCanvas("canvSPS", "canvSPS", 1500, 1000);
+  plotSPS->Draw();
+  TLegend *legend_SPS = new TLegend(0.25, 0.70, 0.45, 0.90);
+  legend_SPS->AddEntry("fit", "Sigmoid*Exp Fit", "l");
+  legend_SPS->SetBorderSize(0);
+  legend_SPS->Draw();
+  canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR1a/SPSFit.png");
+  canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR1b/SPSFit.png");
+  canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR2/SPSFit.png");  
+  canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR3/SPSFit.png");
+
+  TQ_mass_tilde.setConstant(kTRUE);
+  m0.setConstant(kTRUE);
+  d.setConstant(kTRUE);
+ 
+
+  RooWorkspace *w_SPS = new RooWorkspace("w_SPS", "workspace_SPS"); 
+  w_SPS->import(sigmoid_pdf);
+  w_SPS->writeToFile("workspace_fitSPS.root");
+  gDirectory->Add(w_SPS);
+  
+
+  delete canvSPS;
+  delete data;
+  delete legend_SPS;
+  return r;
+}
+
+
+
+
+
+RooFitResult* Fit_CR(std::string CR_input){
+
+  TFile *fCR = new TFile(("fout_mRun2018_A_B_C_D_trigger_"+CR_input+".root").c_str());
+  TTree* treeCR = (TTree*)fCR->Get("tree_red");
+
+  Long64_t nentries = (Long64_t)treeCR->GetEntries();
+  cout<<"N. entries CR: "<<nentries<<endl;
+
+  RooRealVar TQ_mass_tilde("TQ_mass_tilde", "TQ_mass_tilde", 0, 60);
+ 
+  RooDataSet *data_CR = new RooDataSet("data_CR", "data_CR", treeCR, RooArgSet(TQ_mass_tilde));
+
+  RooRealVar m0("m0", "m0", 19., 0., 20.);
+  RooRealVar d("d", "d", -5., -10., 10.);
+  RooRealVar mean("mean", "maean", 23., 21., 26.);
+  RooRealVar sigma("sigma", "sigma", 5., 0., 10.);
+  
+  RooGaussian gauss("gauss", "gauss", TQ_mass_tilde, mean, sigma);                                                                                                                                                             
+  RooGenericPdf sigmoid_pdf("sigmoid_pdf", "sigmoid_pdf", "(TMath::Exp(TQ_mass_tilde))/(1+TMath::Exp((m0-TQ_mass_tilde)/d))", RooArgList(TQ_mass_tilde, m0, d));
+  RooRealVar fraction("fraction", "fraction", 0.1, 0., 0.2);
+  RooAddPdf model_CR("model_CR", "model_CR", RooArgList(gauss, sigmoid_pdf), fraction);
+  RooFitResult *r = model_CR.fitTo(*data_CR, Save()); 
+
+  //Fit gauss+cheb 
+  //RooRealVar mean("mean", "mean", 22., 0., 23.);
+  //RooRealVar sigma("sigma", "sigma", 5., 0., 10.);
+  //RooRealVar a0("a0", "a0", -0.1, 0., 2.);
+  //RooRealVar a1("a1", "a1", -0.1, -3., 0.);
+  // RooRealVar a2("a2", "a2", 0.1, -0.5, 2.);
+  // RooRealVar a3("a3", "a3", -0.1, -1., 5.);
+  // RooRealVar a4("a4", "a4", -0.1, -1., 1.);
+  // RooRealVar a5("a5", "a5", -0.1, -1., 1.);
+  //RooGaussian gauss("gauss", "gauss", TQ_mass_tilde,mean, sigma);
+  //RooChebychev cheb("cheb", "cheb", TQ_mass_tilde, RooArgSet(a0, a1));
+  //RooRealVar fraction("fraction", "fraction", 0.0001, 0., 1.);
+  //RooAddPdf model_CR("model_CR", "model_CR", RooArgList(cheb, gauss), fraction);
+ 
+  //RooFitResult *r = model_CR.fitTo(*data_CR, Save());
+
+  //Fit cheb only
+  // RooRealVar a0("a0", "a0", 0.1, -0.5, 1.);
+  // RooRealVar a1("a1", "a1", -0.1, -0.5, 1.);
+  //RooRealVar a2("a2", "a2", -0.1, -0.5, 1.);
+  //RooRealVar a3("a3", "a3", -0.1, -0.5, 1.);
+  // RooRealVar a4("a4", "a4", -0.1, -0.5, 1.);
+  // RooRealVar a5("a5", "a5", -0.1, -0.5, 1.);
+
+
+  // RooChebychev cheb("cheb", "cheb", TQ_mass_tilde, RooArgSet(a0, a1, a2, a3, a4, a5));
+  
+  // RooFitResult *r = cheb.fitTo(*data_CR, Save());
+
+  
+  RooPlot* plotCR = TQ_mass_tilde.frame();
+  plotCR->SetTitle( "CR" );
+  plotCR->GetXaxis()->SetTitle("#tilde{m}_{TQ} [GeV]");
+  plotCR->GetYaxis()->SetTitleOffset( 1.5 );
+  plotCR->GetYaxis()->SetTitle("Events / 0.5 GeV");
+  data_CR->plotOn(plotCR);
+  model_CR.plotOn(plotCR, Components("gauss"), LineColor(kRed));
+  model_CR.plotOn(plotCR, Components("sigmoid_pdf"), LineColor(kGreen));
+  //cheb.plotOn(plotCR);
+  model_CR.plotOn(plotCR);
+  //sigmoid_pdf.plotOn(plotCR);
+  TCanvas* canvCR = new TCanvas("canvCR", "canvCR", 1500, 1000);
+  plotCR->Draw();
+  canvCR->SaveAs(("/eos/home-l/lfantini/www/Background/"+CR_input+"/CRFit.png").c_str());  
+
+  TQ_mass_tilde.setConstant(kTRUE);
+  mean.setConstant(kTRUE);
+  sigma.setConstant(kTRUE);
+  m0.setConstant(kTRUE);
+  d.setConstant(kTRUE);
+  fraction.setConstant(kTRUE);
+  
+
+  RooWorkspace *w_CR = new RooWorkspace("w_CR", "workspace_CR");
+  w_CR->import(model_CR);
+  w_CR->writeToFile("workspace_fitCR.root");
+  gDirectory->Add(w_CR);
+
+  delete canvCR;
+  delete data_CR;
+  return r;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
