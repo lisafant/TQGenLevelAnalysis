@@ -22,7 +22,7 @@ double WeightSPS(Long64_t N_gen, double xsec_tot, double lum_mis){
   double xsec = xsec_tot*BR;
   double lum_eq = (double)N_gen/xsec;
   double weight = lum_mis/lum_eq;
-  return (weight*BR);
+  return (weight);
 }
 
 
@@ -59,14 +59,14 @@ void GraphBG(std::string CR_input){
   Double_t cross_sec= (xsec->GetValue())*1000.; //fb 
   cout<<"Cross section SPS: "<<cross_sec<<endl;
 
-  double weightSPS = WeightSPS(nentriesSPS, cross_sec, lum_mis);
-  cout<<"Weight lum*BR for SPS: "<<weightSPS<<endl;
+  double weightSPS = WeightSPS(nentriesSPS, cross_sec, lum_mis)*0.15*nentriesSPS;
+  cout<<"Weight lum for SPS: "<<weightSPS<<endl;
 
 /////////STATISTICAL TESTS////////
   THStack *test = new THStack("test", "Mass tilde stat test; #tilde{m}_{TQ} [GeV]; Events / 0.21 GeV");
   
-  TH1F *SR_test = new TH1F("SR_test", "", 70, 13, 28);
-  TH1F *CR_test = new TH1F("CR_test", "", 70, 13, 28);
+  TH1F *SR_test = new TH1F("SR_test", "", 500, 13, 28);
+  TH1F *CR_test = new TH1F("CR_test", "", 500, 13, 28);
  
   Float_t mass_tilde_SR;
   Float_t mass_tilde_CR;
@@ -169,8 +169,8 @@ void GraphBG(std::string CR_input){
   double int_TQ_mass = SR_TQ_mass->Integral();
 //cout<<int_TQ_mass<<endl;
   CR_TQ_mass->Scale(int_TQ_mass/CR_TQ_mass->Integral());  
-  SPS_TQ_mass->Scale((weightSPS*cross_sec)/SPS_TQ_mass->Integral()); 
-//cout<<SPS_TQ_mass->Integral()<<endl;
+   SPS_TQ_mass->Scale((weightSPS)/SPS_TQ_mass->Integral()); 
+cout<<SPS_TQ_mass->Integral()<<endl;
 
 
   SR_TQ_mass->SetLineColor(1);
@@ -212,7 +212,7 @@ void GraphBG(std::string CR_input){
   
 
 //TQ mass tilde
-  THStack *TQ_mass_tilde = new THStack("TQ_mass_tilde", "Tetraquark mass tilde; m_{TQ} [GeV]; Events / 0.6 GeV");
+  THStack *TQ_mass_tilde = new THStack("TQ_mass_tilde", "Tetraquark mass tilde; #tilde{m}_{TQ} [GeV]; Events / 0.6 GeV");
 
   TH1F *SR_TQ_mass_tilde = new TH1F("SR_TQ_mass_tilde", "TQ mass tilde SR", 100, 0, 60);
   treeTQ->Draw("TQ_mass_tilde>>SR_TQ_mass_tilde");
@@ -232,7 +232,7 @@ void GraphBG(std::string CR_input){
 
   double int_TQ_mass_tilde = SR_TQ_mass_tilde->Integral();
   CR_TQ_mass_tilde->Scale(int_TQ_mass_tilde/CR_TQ_mass_tilde->Integral());  
-  SPS_TQ_mass_tilde->Scale((weightSPS*cross_sec)/SPS_TQ_mass_tilde->Integral()); 
+  SPS_TQ_mass_tilde->Scale(weightSPS/SPS_TQ_mass_tilde->Integral()); 
 
   SR_TQ_mass_tilde->SetLineColor(1);
   CR_TQ_mass_tilde->SetLineColor(2);
@@ -256,6 +256,7 @@ void GraphBG(std::string CR_input){
 
   TCanvas *TQ_Mass_Tilde = new TCanvas("TQ_Mass_tilde", "Tetraquark mass tilde", 1500, 1000);
   TQ_mass_tilde->Draw("HIST nostack");
+  //gPad->SetLogy();
   TLegend* legend_TQ_mass_tilde = new TLegend(0.60, 0.78, 0.80, 0.88);
   legend_TQ_mass_tilde->AddEntry(SR_TQ_mass_tilde, "Signal Region", "l");
   legend_TQ_mass_tilde->AddEntry(CR_TQ_mass_tilde, "Control Region", "l");
@@ -286,7 +287,7 @@ void GraphBG(std::string CR_input){
                                                                                              
   double int_TQ_pt = SR_TQ_pt->Integral();
   CR_TQ_pt->Scale(int_TQ_pt/CR_TQ_pt->Integral());  
-  SPS_TQ_pt->Scale((weightSPS*cross_sec)/SPS_TQ_pt->Integral()); 
+  SPS_TQ_pt->Scale(weightSPS/SPS_TQ_pt->Integral()); 
                                                                                              
   SR_TQ_pt->SetLineColor(1);
   CR_TQ_pt->SetLineColor(2);
@@ -332,7 +333,7 @@ void GraphBG(std::string CR_input){
                                                                                              
   double int_TQ_eta = SR_TQ_eta->Integral();
   CR_TQ_eta->Scale(int_TQ_eta/CR_TQ_eta->Integral());  
-  SPS_TQ_eta->Scale((weightSPS*cross_sec)/SPS_TQ_eta->Integral()); 
+  SPS_TQ_eta->Scale(weightSPS/SPS_TQ_eta->Integral()); 
                                                                                              
   SR_TQ_eta->SetLineColor(1);
   CR_TQ_eta->SetLineColor(2);
@@ -363,7 +364,8 @@ void GraphBG(std::string CR_input){
 
 
 //Ym mass
-  THStack *Ym_mass = new THStack("Ym_mass", "Ym mass; #tilde_{m}_{Ym} [GeV]; Events / 0.2 GeV");
+  THStack *Ym_mass = new THStack("Ym_mass", "Ym mass; m_{Ym} [GeV]; Events / 0.2 GeV");
+  THStack *Ym_mass_small = new THStack("Ym_mass_small", "Ym mass; m_{Ym} [GeV]; Events / 0.05 GeV");
 
   TH1F *SR_Ym_mass = new TH1F("SR_Ym_mass", "Ym mass SR", 100, 0, 20);
   treeTQ->Draw("Ym_mass>>SR_Ym_mass");
@@ -371,28 +373,51 @@ void GraphBG(std::string CR_input){
   treeCR->Draw("Ym_mass>>CR_Ym_mass");
   TH1F *SPS_Ym_mass = new TH1F("SPS_Ym_mass", "Ym mass CR", 100, 0, 20);
   treeSPS->Draw("Ym_mass>>SPS_Ym_mass");          
+  TH1F *SR_Ym_mass_small = new TH1F("SR_Ym_mass_small", "Ym mass small", 100, 7, 12);
+  treeTQ->Draw("Ym_mass>>SR_Ym_mass_small");
+  TH1F *CR_Ym_mass_small = new TH1F("CR_Ym_mass_small", "Ym mass CR", 100, 7, 12);
+  treeCR->Draw("Ym_mass>>CR_Ym_mass_small");
+  TH1F *SPS_Ym_mass_small = new TH1F("SPS_Ym_mass_small", "Ym mass SPS", 100, 7, 12);
+  treeSPS->Draw("Ym_mass>>SPS_Ym_mass_small");
  
 
   SR_Ym_mass->Sumw2();
   CR_Ym_mass->Sumw2();
   SPS_Ym_mass->Sumw2();
+  SR_Ym_mass_small->Sumw2();
+  CR_Ym_mass_small->Sumw2();
+  SPS_Ym_mass_small->Sumw2();
                                                                                              
   double int_Ym_mass = SR_Ym_mass->Integral();
   CR_Ym_mass->Scale(int_Ym_mass/CR_Ym_mass->Integral());  
-  SPS_Ym_mass->Scale((weightSPS*cross_sec)/SPS_Ym_mass->Integral()); 
-                                                                                             
+  SPS_Ym_mass->Scale(weightSPS/SPS_Ym_mass->Integral());
+  double int_Ym_mass_small = SR_Ym_mass_small->Integral();
+  CR_Ym_mass_small->Scale(int_Ym_mass_small/CR_Ym_mass_small->Integral());
+  SPS_Ym_mass_small->Scale(weightSPS/SPS_Ym_mass_small->Integral());
+                                                                                       
   SR_Ym_mass->SetLineColor(1);
   CR_Ym_mass->SetLineColor(2);
   SPS_Ym_mass->SetLineColor(4);
   SR_Ym_mass->SetMarkerColor(1);
   CR_Ym_mass->SetMarkerColor(2);
   SPS_Ym_mass->SetMarkerColor(4);
+  SR_Ym_mass_small->SetLineColor(1);
+  CR_Ym_mass_small->SetLineColor(2);
+  SPS_Ym_mass_small->SetLineColor(4);
+  SR_Ym_mass_small->SetMarkerColor(1);
+  CR_Ym_mass_small->SetMarkerColor(2);
+  SPS_Ym_mass_small->SetMarkerColor(4);
                                                                                              
   Ym_mass->Add(SR_Ym_mass);
   Ym_mass->Add(CR_Ym_mass);
   Ym_mass->Add(SPS_Ym_mass);
+  Ym_mass_small->Add(SR_Ym_mass_small);
+  Ym_mass_small->Add(CR_Ym_mass_small);
+  Ym_mass_small->Add(SPS_Ym_mass_small);
                                                                                              
-  TCanvas *Ym_Mass = new TCanvas("Ym_Mass", "Ym mass", 1500, 1000);
+  TCanvas *Ym_Mass = new TCanvas("Ym_Mass", "Ym mass", 1500, 1500);
+  Ym_Mass->Divide(1, 2);
+  Ym_Mass->cd(1);
   Ym_mass->Draw("HIST nostack");
   TLegend* legend_Ym_mass = new TLegend(0.60, 0.78, 0.80, 0.88);   
   legend_Ym_mass->AddEntry(SR_Ym_mass, "Signal Region", "l");
@@ -400,13 +425,27 @@ void GraphBG(std::string CR_input){
   legend_Ym_mass->AddEntry(SPS_Ym_mass, "SPS", "l");
   legend_Ym_mass->SetBorderSize(0);
   legend_Ym_mass->Draw();
+  Ym_Mass->cd(2);
+  Ym_mass_small->Draw("HIST nostack");    
+  //Ym_mass_small->GetXaxis()->SetLimits(7., 12.);                                 
+  TLegend* legend_Ym_mass_small = new TLegend(0.60, 0.78, 0.80, 0.88);   
+  legend_Ym_mass_small->AddEntry(SR_Ym_mass_small, "Signal Region", "l");
+  legend_Ym_mass_small->AddEntry(CR_Ym_mass_small, "Control Region", "l");
+  legend_Ym_mass_small->AddEntry(SPS_Ym_mass_small, "SPS", "l");
+  legend_Ym_mass_small->SetBorderSize(0);
+  legend_Ym_mass_small->Draw();
   Ym_Mass->SaveAs(("/eos/home-l/lfantini/www/Background/"+CR_input+"/massYm.png").c_str());
   delete Ym_mass;
+  delete Ym_mass_small;
   delete Ym_Mass;
   delete SR_Ym_mass;
+  delete SR_Ym_mass_small;
   delete CR_Ym_mass;
+  delete CR_Ym_mass_small;
   delete SPS_Ym_mass;
+  delete SPS_Ym_mass_small;
   delete legend_Ym_mass;
+  delete legend_Ym_mass_small;
 
 
 //Ym pt
@@ -425,7 +464,7 @@ void GraphBG(std::string CR_input){
                                                                                              
   double int_Ym_pt = SR_Ym_pt->Integral();
   CR_Ym_pt->Scale(int_Ym_pt/CR_Ym_pt->Integral());  
-  SPS_Ym_pt->Scale((weightSPS*cross_sec)/SPS_Ym_pt->Integral()); 
+  SPS_Ym_pt->Scale(weightSPS/SPS_Ym_pt->Integral()); 
                                                                                              
   SR_Ym_pt->SetLineColor(1);
   CR_Ym_pt->SetLineColor(2);
@@ -470,7 +509,7 @@ void GraphBG(std::string CR_input){
                                                                                              
   double int_Ym_eta = SR_Ym_eta->Integral();
   CR_Ym_eta->Scale(int_Ym_eta/CR_Ym_eta->Integral());  
-  SPS_Ym_eta->Scale((weightSPS*cross_sec)/SPS_Ym_eta->Integral()); 
+  SPS_Ym_eta->Scale(weightSPS/SPS_Ym_eta->Integral()); 
                                                                                              
   SR_Ym_eta->SetLineColor(1);
   CR_Ym_eta->SetLineColor(2);
@@ -515,7 +554,7 @@ void GraphBG(std::string CR_input){
                                                                                              
   double int_Ye_mass = SR_Ye_mass->Integral();
   CR_Ye_mass->Scale(int_Ye_mass/CR_Ye_mass->Integral());  
-  SPS_Ye_mass->Scale((weightSPS*cross_sec)/SPS_Ye_mass->Integral()); 
+  SPS_Ye_mass->Scale(weightSPS/SPS_Ye_mass->Integral()); 
                                                                                              
   SR_Ye_mass->SetLineColor(1);
   CR_Ye_mass->SetLineColor(2);
@@ -562,7 +601,7 @@ void GraphBG(std::string CR_input){
                                                                                              
   double int_Ye_pt = SR_Ye_pt->Integral();
   CR_Ye_pt->Scale(int_Ye_pt/CR_Ye_pt->Integral());  
-  SPS_Ye_pt->Scale((weightSPS*cross_sec)/SPS_Ye_pt->Integral()); 
+  SPS_Ye_pt->Scale(weightSPS/SPS_Ye_pt->Integral()); 
                                                                                              
   SR_Ye_pt->SetLineColor(1);
   CR_Ye_pt->SetLineColor(2);
@@ -607,7 +646,7 @@ void GraphBG(std::string CR_input){
                                                                                              
   double int_Ye_eta = SR_Ye_eta->Integral();
   CR_Ye_eta->Scale(int_Ye_eta/CR_Ye_eta->Integral());  
-  SPS_Ye_eta->Scale((weightSPS*cross_sec)/SPS_Ye_eta->Integral()); 
+  SPS_Ye_eta->Scale(weightSPS/SPS_Ye_eta->Integral()); 
                                                                                              
   SR_Ye_eta->SetLineColor(1);
   CR_Ye_eta->SetLineColor(2);
