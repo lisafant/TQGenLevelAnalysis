@@ -43,120 +43,61 @@ RooFitResult* Fit_SPS(){
 //  RooRealVar* weig = (RooRealVar*) data->addColumn(wFunc);
 //  RooDataSet wdata(data->GetName(),data->GetTitle(),data,*data->get(),0,weig->GetName());
  
- /* RooRealVar mean("mean", "mean", 21., 19., 30.);
-  RooRealVar sigma("sigma", "sigma", 5., 0., 20.);
 
-  RooLandau landau("landau", "landau", TQ_mass_tilde, mean, sigma);
-  RooFitResult *r = landau.fitTo(*data, Save());
-*/
-
-/*  RooRealVar alpha("alpha", "alpha", 0.5, 0., 10.);
-  RooRealVar a("a", "a", 0.5, -1., 1.);
-  RooRealVar b("b", "b", 0.5, -1., 1.);
-
-  RooGenericPdf exp_pol("exp_pol", "exp_pol", "(TMath::Exp(TQ_mass_tilde*alpha))*(a*TQ_mass_tilde + b*TMath::Power(TQ_mass_tilde, 2)))", RooArgList(TQ_mass_tilde, alpha, a, b));
-
-*/
-  //RooFitResult *r = exp_pol.fitTo(*data, Save());
- RooRealVar m0("m0", "m0", 19.5, 15., 30.);
-  RooRealVar d("d", "d", 0.08, 0., 10.);
-  RooRealVar a("a", "a", 0.5, -5., 5.);
-  RooRealVar b("b", "b", 0.5, -5., 5.);
-  RooRealVar c("c", "c", 0.5, -5., 5.);
-  RooRealVar decay("decay", "decay", -0.2, -1., -0.00005);
-
-  //RooGenericPdf sigmoid_pdf("sigmoid_pdf", "sigmoid_pdf", "(1./(1+TMath::Exp((m0-TQ_mass_tilde)/d)))", RooArgList(TQ_mass_tilde, m0, d));
-  //RooExponential exp_pdf("exp_pdf", "exp_pdf", TQ_mass_tilde, decay);
-  //RooFFTConvPdf conv1("conv1", "conv1", TQ_mass_tilde, sigmoid_pdf, exp_pdf);
- // RooGenericPdf sigmoid_pdf("sigmoid_pdf", "sigmoid_pdf", "(TMath::Exp((TQ_mass_tilde)*decay)/(1+TMath::Exp((m0-TQ_mass_tilde)/d)))", RooArgList(TQ_mass_tilde, m0, d, decay));
- /*
-  RooGenericPdf exp_pol("exp_pol", "exp_pol", "TMath::Exp(TQ_mass_tilde * decay) * (a*TQ_mass_tilde + b*TQ_mass_tilde*TQ_mass_tilde +c)", RooArgList(TQ_mass_tilde, decay, a, b, c));
-  
-  RooFitResult *r = exp_pol.fitTo(*data, Save());
- */
   RooRealVar mean("mean", "mean", 21., 18., 24.);
   RooRealVar sigma("sigma", "sigma", 0.5, 0.05, 5.);
   RooRealVar alpha("alpha", "alpha", 0.8, 0.1, 5);
   RooRealVar n("n", "n", 1.8, 0.1, 20.);
-  RooRealVar mean_pos("mean_pos", "mean_pos", 21., 18., 24.);
+  //RooRealVar mean_pos("mean_pos", "mean_pos", 21., 18., 24.);
   RooRealVar sigma_pos("sigma_pos", "sigma_pos", 0.5, 0.05, 5.);
   RooRealVar alpha_pos("alpha_pos", "alpha_pos", -0.2, -5., -0.01);
   RooRealVar n_pos("n_pos", "n_pos", 1.8, 0.1, 20.);
   RooRealVar fraction("fraction", "fraction", 0.8, 0., 1.);
 
   RooCBShape cryst("cryst", "cryst", TQ_mass_tilde, mean, sigma, alpha, n);
-  RooCBShape cryst_pos("cryst_pos", "cryst_ps", TQ_mass_tilde, mean, sigma, alpha_pos, n_pos);
-  RooAddPdf tot("tot", "tot", RooArgList(cryst, cryst_pos), fraction);
+  RooCBShape cryst_pos("cryst_pos", "cryst_ps", TQ_mass_tilde, mean, sigma_pos, alpha_pos, n_pos);
+  RooAddPdf pdfSPS("pdfSPS", "pdfSPS", RooArgList(cryst, cryst_pos), fraction);
 
-  RooFitResult *r = tot.fitTo(*data, Save());
+  RooFitResult *r = pdfSPS.fitTo(*data, Save());
 
-/*
-  RooRealVar alpha("alpha", "alpha", -0.5, -5., 5.);
-  RooExponential exp("exp", "exp", TQ_mass_tilde, alpha);
 
-  RooFitResult *r = exp.fitTo(*data, Save());
-*/
 
  
-/*
-  RooRealVar mean("mean", "mean", 20., 19., 21.);
-  RooRealVar sigma("sigma", "sigma", 0.5, 0., 5.);
-  RooRealVar alpha("alpha", "alpha", -2., -10., 0.);
-  //RooRealVar a ("a", "a", 100.);
-  RooRealVar n("n", "n", 1.8, 0.1, 20.);
 
-  //RooAddition sum_var("sum_var", "sum_var", RooArgList(TQ_mass_tilde, a));
-
-  RooGaussian gauss_SPS("gauss_SPS", "gauss_SPS", TQ_mass_tilde, mean, sigma);
-  RooExponential exp_SPS("exp_SPS", "exp_SPS", TQ_mass_tilde, alpha);
-  RooRealVar fraction ("fraction", "fraction", 0.5, 0., 1.);
-  //RooAddPdf sum("sum", "sum", RooArgList(gauss_SPS, exp_SPS), fraction);
-  RooFFTConvPdf conv("conv", "conv", TQ_mass_tilde, exp_SPS, gauss_SPS);
-  RooCBShape cryst("cryst", "cryst", TQ_mass_tilde, mean, sigma, alpha, n);
-
-  RooFitResult *r = cryst.fitTo(*data, Save());
-  
-  RooGaussian gauss("gauss", "gauss", TQ_mass_tilde, mean, sigma);
-  RooExponential exp("exp", "exp", TQ_mass_tilde, alpha); 
-*/
   RooPlot* plotSPS = TQ_mass_tilde.frame();
   plotSPS->SetTitle( "SPS" );
   plotSPS->GetXaxis()->SetTitle("#tilde{m}_{TQ} [GeV]");
   plotSPS->GetYaxis()->SetTitleOffset( 1.5 );
   plotSPS->GetYaxis()->SetTitle("Events / 0.3 GeV");
-  data->plotOn(plotSPS, Name ("MC"));
-  //sum.plotOn(plotSPS);
-  //sum.plotOn(plotSPS, Components("gauss_SPS"), LineColor(kRed));
-  //sum.plotOn(plotSPS, Components("exp_SPS"), LineColor(kGreen));
-  //conv.plotOn(plotSPS);
-  //gauss.plotOn(plotSPS, LineColor(kRed));
-  //exp.plotOn(plotSPS, LineColor(kGreen));
-  //conv1.plotOn(plotSPS);
-  //exp_pol.plotOn(plotSPS);  
-  tot.plotOn(plotSPS);
-//sigmoid_pdf.plotOn(plotSPS, Name("fit"));
- // exp.plotOn(plotSPS);
-  //landau.plotOn(plotSPS);
-  //exp_pol.plotOn(plotSPS);
-  //cryst.plotOn(plotSPS);
+  data->plotOn(plotSPS, Name ("MC")); 
+  pdfSPS.plotOn(plotSPS, Name ("fit"));
+  pdfSPS.plotOn(plotSPS, Name ("cryst1"), Components("cryst"), LineColor(kBlack));
+  pdfSPS.plotOn(plotSPS, Name ("cryst2"), Components("cryst_pos"), LineColor(kRed));
   TCanvas* canvSPS = new TCanvas("canvSPS", "canvSPS", 1500, 1000);
   plotSPS->Draw();
-  TLegend *legend_SPS = new TLegend(0.25, 0.70, 0.45, 0.90);
-  legend_SPS->AddEntry("fit", "Sigmoid*Exp Fit", "l");
+  TLegend *legend_SPS = new TLegend(0.20, 0.70, 0.40, 0.90);
+  legend_SPS->AddEntry("fit", "CB1 + CB2 Fit", "l");
+  legend_SPS->AddEntry("cryst1", "Crystal Ball 1", "l");
+  legend_SPS->AddEntry("cryst2", "Crystal Ball 2", "l");
   legend_SPS->SetBorderSize(0);
   legend_SPS->Draw();
   canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR1a/SPSFit.png");
   canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR1b/SPSFit.png");
   canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR2/SPSFit.png");  
   canvSPS->SaveAs("/eos/home-l/lfantini/www/Background/CR3/SPSFit.png");
-/*
+
   TQ_mass_tilde.setConstant(kTRUE);
-  m0.setConstant(kTRUE);
-  d.setConstant(kTRUE);
- */
+  mean.setConstant(kTRUE);
+  sigma.setConstant(kTRUE);
+  alpha.setConstant(kTRUE);
+  n.setConstant(kTRUE);
+  sigma_pos.setConstant(kTRUE);
+  alpha_pos.setConstant(kTRUE);
+  n_pos.setConstant(kTRUE);
+  
 
   RooWorkspace *w_SPS = new RooWorkspace("w_SPS", "workspace_SPS"); 
-  //w_SPS->import(sigmoid_pdf);
+  w_SPS->import(pdfSPS);
   w_SPS->writeToFile("workspace_fitSPS.root");
   gDirectory->Add(w_SPS);
   
@@ -179,59 +120,24 @@ RooFitResult* Fit_CR(std::string CR_input){
   Long64_t nentries = (Long64_t)treeCR->GetEntries();
   cout<<"N. entries CR: "<<nentries<<endl;
 
-  RooRealVar TQ_mass_tilde("TQ_mass_tilde", "TQ_mass_tilde", 10, 30);
+  RooRealVar TQ_mass_tilde("TQ_mass_tilde", "TQ_mass_tilde", 13, 30);
  
   RooDataSet *data_CR = new RooDataSet("data_CR", "data_CR", treeCR, RooArgSet(TQ_mass_tilde));
 
- /* RooRealVar m0("m0", "m0", 19., 0., 20.);
-  RooRealVar d("d", "d", -5., -10., 10.);
-  RooRealVar mean("mean", "maean", 23., 21., 26.);
-  RooRealVar sigma("sigma", "sigma", 5., 0., 10.);
-  
-  RooGaussian gauss("gauss", "gauss", TQ_mass_tilde, mean, sigma);                                                                                                                                                             
-  RooGenericPdf sigmoid_pdf("sigmoid_pdf", "sigmoid_pdf", "(TMath::Exp(TQ_mass_tilde))/(1+TMath::Exp((m0-TQ_mass_tilde)/d))", RooArgList(TQ_mass_tilde, m0, d));
-  RooRealVar fraction("fraction", "fraction", 0.1, 0., 0.2);
-  RooAddPdf model_CR("model_CR", "model_CR", RooArgList(gauss, sigmoid_pdf), fraction);
-  RooFitResult *r = model_CR.fitTo(*data_CR, Save()); 
-*/
-  //Fit gauss+cheb 
-  //RooRealVar mean("mean", "mean", 22., 0., 23.);
-  //RooRealVar sigma("sigma", "sigma", 5., 0., 10.);
-  //RooRealVar a0("a0", "a0", -0.1, 0., 2.);
-  //RooRealVar a1("a1", "a1", -0.1, -3., 0.);
-  // RooRealVar a2("a2", "a2", 0.1, -0.5, 2.);
-  // RooRealVar a3("a3", "a3", -0.1, -1., 5.);
-  // RooRealVar a4("a4", "a4", -0.1, -1., 1.);
-  // RooRealVar a5("a5", "a5", -0.1, -1., 1.);
-  //RooGaussian gauss("gauss", "gauss", TQ_mass_tilde,mean, sigma);
-  //RooChebychev cheb("cheb", "cheb", TQ_mass_tilde, RooArgSet(a0, a1));
-  //RooRealVar fraction("fraction", "fraction", 0.0001, 0., 1.);
-  //RooAddPdf model_CR("model_CR", "model_CR", RooArgList(cheb, gauss), fraction);
- 
-  //RooFitResult *r = model_CR.fitTo(*data_CR, Save());
+  Double_t n_data_CR =data_CR->sumEntries("TQ_mass_tilde>13. && TQ_mass_tilde<30.");
+  cout<<"N. Entries: "<<n_data_CR<<endl;
 
-  //Fit cheb only
+
   RooRealVar a0("a0", "a0", 0.1, -0.5, 1.);
   RooRealVar a1("a1", "a1", -0.1, -0.5, 1.);
   RooRealVar a2("a2", "a2", -0.1, -0.5, 1.);
   RooRealVar a3("a3", "a3", -0.1, -0.5, 1.);
   RooRealVar a4("a4", "a4", -0.1, -0.5, 1.);
-  RooRealVar a5("a5", "a5", -0.1, -0.5, 1.);
-  RooRealVar a6("a6", "a6", -0.1, -0.5, 1.);
-  RooRealVar a7("a7", "a7", -0.1, -0.5, 1.);
-  RooRealVar a8("a8", "a9", -0.1, -0.5, 1.);
-  RooRealVar a9("a9", "a10",-0.1, -0.5, 1.);
-  RooRealVar a10("a10", "a10", -0.1, -0.5, 1.);
-  RooRealVar a11("a11", "a11", -0.1, -0.5, 1.);
 
-  RooChebychev cheb("cheb", "cheb", TQ_mass_tilde, RooArgSet(a0, a1, a2, a3, a4, a5, a6));
-
-  RooChebychev cheb1("cheb1", "cheb1", TQ_mass_tilde, RooArgSet(a7, a8, a9, a10, a11));
+  RooChebychev cheb("cheb", "cheb", TQ_mass_tilde, RooArgSet(a0, a1, a2, a3, a4));
   
   RooFitResult *r = cheb.fitTo(*data_CR, Save());
-  RooFitResult *r1 = cheb1.fitTo(*data_CR, Save());
 
-  RooKeysPdf CR_pdf("CR_pdf", "CR_pdf", TQ_mass_tilde, *data_CR, RooKeysPdf::NoMirror, 3);
 
   
   RooPlot* plotCR = TQ_mass_tilde.frame();
@@ -240,27 +146,25 @@ RooFitResult* Fit_CR(std::string CR_input){
   plotCR->GetYaxis()->SetTitleOffset( 1.5 );
   plotCR->GetYaxis()->SetTitle("Events / 0.5 GeV");
   data_CR->plotOn(plotCR);
-  //model_CR.plotOn(plotCR, Components("gauss"), LineColor(kRed));
-  //model_CR.plotOn(plotCR, Components("sigmoid_pdf"), LineColor(kGreen));
-  cheb.plotOn(plotCR);
-  cheb1.plotOn(plotCR, LineColor(kRed));
-  CR_pdf.plotOn(plotCR, LineColor(kGreen));
-  //model_CR.plotOn(plotCR);
-  //sigmoid_pdf.plotOn(plotCR);
+  cheb.plotOn(plotCR, Name ("fit"));
   TCanvas* canvCR = new TCanvas("canvCR", "canvCR", 1500, 1000);
   plotCR->Draw();
+  TLegend *legend_CR = new TLegend(0.20, 0.70, 0.40, 0.90);
+  legend_CR->AddEntry("fit", "Chebychev(5) Fit", "l");
+  legend_CR->SetBorderSize(0);
+  legend_CR->Draw();
   canvCR->SaveAs(("/eos/home-l/lfantini/www/Background/"+CR_input+"/CRFit.png").c_str());  
-/*
+
   TQ_mass_tilde.setConstant(kTRUE);
-  mean.setConstant(kTRUE);
-  sigma.setConstant(kTRUE);
-  m0.setConstant(kTRUE);
-  d.setConstant(kTRUE);
-  fraction.setConstant(kTRUE);
+  a0.setConstant(kTRUE);
+  a1.setConstant(kTRUE);
+  a2.setConstant(kTRUE);
+  a3.setConstant(kTRUE);
+  a4.setConstant(kTRUE);
   
-*/
+
   RooWorkspace *w_CR = new RooWorkspace("w_CR", "workspace_CR");
-  //w_CR->import(model_CR);
+  w_CR->import(cheb);
   w_CR->writeToFile("workspace_fitCR.root");
   gDirectory->Add(w_CR);
 

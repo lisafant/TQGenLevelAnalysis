@@ -433,6 +433,236 @@ void compareEffDi(){
   */
 }
 
+void compareSigVsSPS(){
+  TFile* f26= new TFile("analysis/fout_m26_TQ.root");
+  TFile* fSPS= new TFile("analysis/fout_mSPS_TQ.root");
+  TTree* t26= (TTree*) f26->Get("tree_red");
+  TTree* tSPS= (TTree*) fSPS->Get("tree_red");
+
+  TH1F* Ye_26 = new TH1F("Ye_26", "",80,0,20);
+  TH1F* Ye_SPS = new TH1F("Ye_SPS", "",80,0,20);
+  TH1F* Ym_26 = new TH1F("Ym_26", "",80,0,20);
+  TH1F* Ym_SPS = new TH1F("Ym_SPS", "",80,0,20);
+
+  TH1F* pt_Ye_26 = new TH1F("pt_Ye_26", "",80,0,80);
+  TH1F* pt_Ye_SPS = new TH1F("pt_Ye_SPS", "",80,0,80);
+  TH1F* pt_Ym_26 = new TH1F("pt_Ym_26", "",80,0,80);
+  TH1F* pt_Ym_SPS = new TH1F("pt_Ym_SPS", "",80,0,80);
+
+
+  TH1F* eta_Ye_26 = new TH1F("eta_Ye_26", "",80,-10,10);
+  TH1F* eta_Ye_SPS = new TH1F("eta_Ye_SPS", "",80,-10,10);
+  TH1F* eta_Ym_26 = new TH1F("eta_Ym_26", "",80,-10,10);
+  TH1F* eta_Ym_SPS = new TH1F("eta_Ym_SPS", "",80,-10,10);
+
+  TH1F* mass_26 = new TH1F("mass_26", "",80,0,40);
+  TH1F* mass_SPS = new TH1F("mass_SPS", "",80,0,40);
+  TH1F* tmass_26 = new TH1F("tmass_26", "",80,0,40);
+  TH1F* tmass_SPS = new TH1F("tmass_SPS", "",80,0,40);
+  TH1F* pt_26 = new TH1F("pt_26", "",80,0,80);
+  TH1F* pt_SPS = new TH1F("pt_SPS", "",80,0,80);
+  TH1F* eta_26 = new TH1F("eta_26", "",80,-10,10);
+  TH1F* eta_SPS = new TH1F("eta_SPS", "",80,-10,10);
+  
+  t26->Draw("TQ_mass>>mass_26");
+  t26->Draw("TQ_mass_tilde>>tmass_26");
+  t26->Draw("TQ_pt>>pt_26");
+  t26->Draw("TQ_eta>>eta_26");
+  t26->Draw("Ym_mass>>Ym_26");
+  t26->Draw("Ym_pt>>pt_Ym_26");
+  t26->Draw("Ym_eta>>eta_Ym_26");
+  t26->Draw("Ye_mass>>Ye_26");
+  t26->Draw("Ye_pt>>pt_Ye_26");
+  t26->Draw("Ye_eta>>eta_Ye_26");
+
+  
+  tSPS->Draw("TQ_mass>>mass_SPS");
+  tSPS->Draw("TQ_mass_tilde>>tmass_SPS");
+  tSPS->Draw("TQ_pt>>pt_SPS");
+  tSPS->Draw("TQ_eta>>eta_SPS");
+  tSPS->Draw("Ym_mass>>Ym_SPS");
+  tSPS->Draw("Ym_pt>>pt_Ym_SPS");
+  tSPS->Draw("Ym_eta>>eta_Ym_SPS");
+  tSPS->Draw("Ye_mass>>Ye_SPS");
+  tSPS->Draw("Ye_pt>>pt_Ye_SPS");
+  tSPS->Draw("Ye_eta>>eta_Ye_SPS");
+
+
+
+  Ye_26->SetLineColor(kOrange+8);
+  Ye_26->SetMarkerColor(kOrange+8);
+
+  TLegend* leg2 = new TLegend(0.6,0.55, 0.85,0.85);
+  leg2->SetFillColor(kWhite);
+  //  leg2->SetHeader("Signal Shapes");
+  leg2->AddEntry(Ye_26," TQ: 26 GeV" , "LE");
+  leg2->AddEntry(Ye_SPS,"SPS(YY)" , "LE");
+
+  TLegend* leg3 = new TLegend(0.2,0.55, 0.45,0.85);
+  leg3->SetFillColor(kWhite);
+  //  leg3->SetHeader("Signal Shapes");
+  leg3->AddEntry(Ye_26," TQ: 26 GeV" , "LE");
+  leg3->AddEntry(Ye_SPS,"SPS(YY)" , "LE");
+
+
+  TCanvas* c = new TCanvas("c","c",800,600);
+  c->cd();
+  mass_26->SetLineColor(kOrange+8);
+  mass_26->SetMarkerColor(kOrange+8);
+  mass_26->GetXaxis()->SetTitle("m_{TQ} [GeV]");
+  mass_26->GetYaxis()->SetTitle("A.U.");
+  mass_26->DrawNormalized("HIST");
+  mass_SPS->DrawNormalized("HISTSAME");
+  leg3->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/mass_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/mass_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/mass_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/mass_shapes_LOG.pdf");
+
+
+  c->SetLogy(0);
+  tmass_26->SetLineColor(kOrange+8);
+  tmass_26->SetMarkerColor(kOrange+8);
+  tmass_26->GetXaxis()->SetTitle("#tilde{m}_{TQ} [GeV]");
+  tmass_26->GetYaxis()->SetTitle("A.U.");
+  tmass_26->DrawNormalized("HIST");
+  tmass_SPS->DrawNormalized("HISTSAME");
+  leg3->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/tmass_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/tmass_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/tmass_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/tmass_shapes_LOG.pdf");
+
+
+  c->SetLogy(0);
+
+  pt_26->SetLineColor(kOrange+8);
+  pt_26->SetMarkerColor(kOrange+8);
+  pt_26->GetXaxis()->SetTitle("p_{T,TQ} [GeV]");
+  pt_26->GetYaxis()->SetTitle("A.U.");
+  pt_26->DrawNormalized("HIST");
+  pt_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_shapes_LOG.pdf");
+
+  c->SetLogy(0);
+  eta_26->SetLineColor(kOrange+8);
+  eta_26->SetMarkerColor(kOrange+8);
+  eta_26->GetXaxis()->SetTitle("#eta_{TQ} [GeV]");
+  eta_26->GetYaxis()->SetTitle("A.U.");
+  eta_26->DrawNormalized("HIST");
+  eta_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_shapes_LOG.pdf");
+
+  c->SetLogy(0);
+  Ym_26->SetLineColor(kOrange+8);
+  Ym_26->SetMarkerColor(kOrange+8);
+  Ym_26->GetXaxis()->SetTitle("m_{Ym} [GeV]");
+  Ym_26->GetYaxis()->SetTitle("A.U.");
+  Ym_26->DrawNormalized("HIST");
+  Ym_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/Ym_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/Ym_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/Ym_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/Ym_shapes_LOG.pdf");
+
+  c->SetLogy(0);
+  pt_Ym_26->SetLineColor(kOrange+8);
+  pt_Ym_26->SetMarkerColor(kOrange+8);
+  pt_Ym_26->GetXaxis()->SetTitle("p_{T,Ym} [GeV]");
+  pt_Ym_26->GetYaxis()->SetTitle("A.U.");
+  pt_Ym_26->DrawNormalized("HIST");
+  pt_Ym_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ym_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ym_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ym_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ym_shapes_LOG.pdf");
+
+
+  c->SetLogy(0);
+  eta_Ym_26->SetLineColor(kOrange+8);
+  eta_Ym_26->SetMarkerColor(kOrange+8);
+  eta_Ym_26->GetXaxis()->SetTitle("#eta_{Ym} [GeV]");
+  eta_Ym_26->GetYaxis()->SetTitle("A.U.");
+  eta_Ym_26->DrawNormalized("HIST");
+  eta_Ym_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ym_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ym_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ym_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ym_shapes_LOG.pdf");
+
+
+  c->SetLogy(0);
+  pt_Ye_26->SetLineColor(kOrange+8);
+  pt_Ye_26->SetMarkerColor(kOrange+8);
+  pt_Ye_26->GetXaxis()->SetTitle("p_{T,Ye} [GeV]");
+  pt_Ye_26->GetYaxis()->SetTitle("A.U.");
+  pt_Ye_26->DrawNormalized("HIST");
+  pt_Ye_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ye_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ye_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ye_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/pt_Ye_shapes_LOG.pdf");
+
+
+  c->SetLogy(0);
+  eta_Ye_26->SetLineColor(kOrange+8);
+  eta_Ye_26->SetMarkerColor(kOrange+8);
+  eta_Ye_26->GetXaxis()->SetTitle("#eta_{Ye} [GeV]");
+  eta_Ye_26->GetYaxis()->SetTitle("A.U.");
+  eta_Ye_26->DrawNormalized("HIST");
+  eta_Ye_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ye_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ye_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ye_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/eta_Ye_shapes_LOG.pdf");
+
+  c->SetLogy(0);
+  Ye_26->SetLineColor(kOrange+8);
+  Ye_26->SetMarkerColor(kOrange+8);
+  Ye_26->GetXaxis()->SetTitle("m_{Ye} [GeV]");
+  Ye_26->GetYaxis()->SetTitle("A.U.");
+  Ye_26->DrawNormalized("HIST");
+  Ye_SPS->DrawNormalized("HISTSAME");
+  leg2->Draw("same");
+  c->SaveAs("~/www/TQ-WORK/bkg/Ye_shapes.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/Ye_shapes.pdf");
+
+  c->SetLogy();
+  c->SaveAs("~/www/TQ-WORK/bkg/Ye_shapes_LOG.png");
+  c->SaveAs("~/www/TQ-WORK/bkg/Ye_shapes_LOG.pdf");
+
+}
 
 
 void plotMasses(){
@@ -450,6 +680,7 @@ void plotMasses(){
   TTree* t18= (TTree*) f18->Get("tree_red");
   TTree* t22= (TTree*) f22->Get("tree_red");
   TTree* t26= (TTree*) f26->Get("tree_red");
+
 
 
   TH1F* mass_7 =  new TH1F("mass_7", "",120,0,60);

@@ -52,6 +52,10 @@ int runTQ(std::string mass, std::string region){
     t.Add("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m18_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K.root");
     TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m18_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K.root");
     h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
+  }else if(mass=="18wTrigger"){
+    t.Add("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m18_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_1M_wTrigger.root");
+    TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m18_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_1M_wTrigger.root");
+    h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
   }else if(mass=="22"){
     t.Add("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m22_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K.root");
     TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m22_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K.root");
@@ -60,7 +64,13 @@ int runTQ(std::string mass, std::string region){
     t.Add("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m26_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K.root");
     TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m26_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K.root");
     h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
+  }else if(mass=="26wTrigger"){
+    t.Add("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m26_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K_wTrigger.root");
+    TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_m26_PseudoScalar_13TeV_106X_PRIVATE_MATTIA_100K_wTrigger.root");
+    h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
   }
+
+
 
 
  if(mass=="SPS"){
@@ -69,7 +79,19 @@ int runTQ(std::string mass, std::string region){
     h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
   }
 
+ if(mass=="SPSwTrigger"){
+    t.Add("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_SPS_inclusive_ggToYYTo2mu2e_2018_PRIVATE_MATTIA_600K_wTrigger.root");
+    TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_SPS_inclusive_ggToYYTo2mu2e_2018_PRIVATE_MATTIA_600K_wTrigger.root");
+    h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
+  }
 
+
+  if(mass=="DPSwTrigger"){
+    t.Add("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_DPS_inclusive_ggToYYTo2mu2e_2018_PRIVATE_MATTIA_600K_wTrigger.root");
+    TFile* f = new TFile("/eos/cms/store/group/phys_egamma/soffi/ggXToYYTo2mu2e/ntuple_ggXToYYTo2mu2e_DPS_inclusive_ggToYYTo2mu2e_2018_PRIVATE_MATTIA_600K_wTrigger.root");
+    h_counter=(TH1F*)f->Get("GenAnalysis/h_counter");
+
+  }
 
   if(mass=="Run2018B"){
     t.Add("/eos/cms/store/group/phys_egamma/soffi/TQ-DATA/ntuple_MuOnia_Run2018B-UL2018_MiniAODv2-v1.root");
@@ -136,8 +158,8 @@ void runCRAll_data(){
   runTQ("Run2018C_trigger", "CR");
   runTQ("Run2018D_trigger", "CR");
 }
-*/
 
+*/
 void runTQAll(){
 
   runTQ("5", "TQ");
@@ -149,3 +171,4 @@ void runTQAll(){
   runTQ("26", "TQ");
 
 }
+

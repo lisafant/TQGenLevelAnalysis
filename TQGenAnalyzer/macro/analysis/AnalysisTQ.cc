@@ -72,6 +72,10 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    Float_t mass_Err;
    Float_t x_sec;
    Float_t puw2018;
+<<<<<<< HEAD
+=======
+   Float_t nvtxw2018;
+>>>>>>> 640558b0a2cc055407b9b93d07103db7f4f1453a
    Int_t n_vtx;
 
 
@@ -110,6 +114,10 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
    tree_red.Branch("mass_Err", &mass_Err, "mass_Err/F");
    tree_red.Branch("x_sec", &x_sec, "x_sec/F");
    tree_red.Branch("puw2018", &puw2018, "puw2018/F");
+<<<<<<< HEAD
+=======
+   tree_red.Branch("nvtxw2018", &nvtxw2018, "nvtxw2018/F");
+>>>>>>> 640558b0a2cc055407b9b93d07103db7f4f1453a
    tree_red.Branch("n_vtx", &n_vtx, "n_vtx/I");
 
 
@@ -318,6 +326,10 @@ void AnalysisTQ::Loop(std::string mass,int tot,int trigger)
         mass_Err= (*recoTQ_massErr)[best_cand]; 
         x_sec = xsec;
         puw2018 = puw_2018;
+<<<<<<< HEAD
+=======
+        nvtxw2018 = nvtxw_2018;
+>>>>>>> 640558b0a2cc055407b9b93d07103db7f4f1453a
         n_vtx = nvtx;
 
 	tree_red.Fill();
